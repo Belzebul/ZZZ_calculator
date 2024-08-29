@@ -21,7 +21,7 @@ class ModelBase():
     pen = 0.0
     pen_flat = 0.0
     energy_regen = 0.0
-    energy_base = 0.0
+    energy_perc = 0.0
     anomaly_prof = 0.0
     anomaly_mastery = 0.0
 
@@ -51,16 +51,16 @@ class Skill():
        
 
 class Disc(ModelBase):
-    def __init__(self, data) -> None:
-        super().__init__(data)
+    def __init__(self) -> None:
+        super().__init__()
 
 class WEngine(ModelBase):
-    def __init__(self, data) -> None:
-        super().__init__(data)
+    def __init__(self) -> None:
+        super().__init__()
 
 class Character(ModelBase):
-    def __init__(self, data) -> None:
-        super().__init__(data)
+    def __init__(self) -> None:
+        super().__init__()
 
     def equip_discs(self, disc:Disc):
         self.discs = disc
@@ -81,7 +81,7 @@ class Character(ModelBase):
         return self.crit_dmg + self.wengine.crit_dmg + self.discs.crit_dmg
 
     def get_energy_regen(self):
-        return self.energy_base * (1 + (self.wengine.energy_regen + self.discs.energy_regen)/100)
+        return self.energy * (1 + (self.wengine.energy_regen + self.discs.energy_regen)/100)
 
     def get_anomaly_mastery(self):
         return self.anomaly_mastery + self.wengine.anomaly_mastery + self.discs.anomaly_mastery

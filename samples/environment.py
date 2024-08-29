@@ -5,16 +5,16 @@ from services import ServiceCharacter
 
 URL_PIPER_DATA = 'Piper_data.json'
 
-JANE_DOE_DATA = {
-    'LVL': 60,
-    'HP_BASE': 7789,
-    'DEF_BASE': 607,
-    'ATK_BASE': 881,
-    'IMPACT': 86,
-    'ANOMALY_PROF': 112,
-    'ANOMALY_MASTERY': 150,
-    'ER':1.2
-}
+janedoe = Character()
+janedoe.lvl = 60
+janedoe.hp_base = 7789
+janedoe.atk_base = 881
+janedoe.defense_base = 607
+janedoe.impact = 86
+janedoe.anomaly_mastery = 150
+janedoe.anomaly_prof = 112
+janedoe.energy_regen = 1.2
+
 
 PIPER_DISCS_DATA = {
     'HP_FLAT': 2200 + 112 + 224,
@@ -61,7 +61,6 @@ def anomaly_hit(enemy:Enemy, char:Character, anomalyType:float):
 if __name__ == '__main__':
     #importar dados do arquivo
     serviceCharacter = ServiceCharacter(URL_PIPER_DATA)
-    janedoe = Character(JANE_DOE_DATA)
 
     #estruturar dados do personagem
     char = serviceCharacter.build_character()
@@ -75,6 +74,8 @@ if __name__ == '__main__':
 
     #calcula o dano
     dmg = anomaly_hit(durahan, janedoe, Anomaly.ASSAULT)
+    dmg_piper = anomaly_hit(durahan, char, Anomaly.ASSAULT)
 
     #output
     print(f'dmg: {dmg:.2f}')
+    print(f'dmg: {dmg_piper:.2f}')

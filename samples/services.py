@@ -1,4 +1,4 @@
-from model_ZZZ import Character, Disc, WEngine
+from model_ZZZ import Character, Disc, WEngine, ModelBase
 import json
 import re
 
@@ -11,21 +11,33 @@ class DiscSetID():
     SWING_JAZZ = 31600
 
 class AttributeID():
-    PEN_FLAT = 23203
-    PEN = 23103
+    HP = 11102
+    HP_FLAT = 11103
     ATK_BASE = 12101
     ATK = 12102
     ATK_FLAT = 12103
-    HP_FLAT = 11103
-    HP = 11102
-    ANOMALY_PROF = 31203
-    ANOMALY_MAST = 31402
-    CRIT_RATE = 20103
-    CRIT_DMG = 21103
     DEF = 13102
     DEF_FLAT = 13103
+    CRIT_RATE = 20103
+    CRIT_DMG = 21103
+    PEN_FLAT = 23203
+    PEN = 23103
+    ANOMALY_PROF = 31203
+    ANOMALY_MAST = 31402
     PHYS_DMG = 31503
-    
+
+class CharAttributeID():
+    HP = 1
+    ATK = 2
+    DEF = 3
+    IMPACT = 4
+    CRIT_RATE = 5
+    CRIT_DMG = 6
+    ANOMALY_MAST = 7
+    ANOMALY_PROF = 8
+    PEN = 9
+    ENERGY_REGEN = 10
+
 
 def load_json(json_url):
         with open(json_url, 'r', encoding="utf-8") as file:
@@ -38,21 +50,54 @@ def remove_perc(attr_str):
         attr = pattern.findall(attr_str)[0]
         return float(attr) if attr != '' else 0.0
 
+def find_attr(modelBase:ModelBase, property_id, attr):
+    match property_id:
+        case AttributeID.HP: modelBase.hp += attr
+        case AttributeID.HP_FLAT: modelBase.hp_flat += attr
+        case AttributeID.ATK_BASE: modelBase.atk_base += attr
+        case AttributeID.ATK: modelBase.atk += attr
+        case AttributeID.ATK_FLAT: modelBase.atk_flat += attr
+        case AttributeID.DEF: modelBase.defense += attr
+        case AttributeID.DEF_FLAT: modelBase.defense_flat += attr
+        case AttributeID.CRIT_RATE: modelBase.crit_rate += attr
+        case AttributeID.CRIT_DMG: modelBase.crit_dmg += attr
+        case AttributeID.PEN: modelBase.pen += attr
+        case AttributeID.PEN_FLAT: modelBase.pen_flat += attr
+        case AttributeID.ANOMALY_MAST: modelBase.anomaly_mastery += attr
+        case AttributeID.ANOMALY_PROF: modelBase.anomaly_prof += attr
+        case AttributeID.PHYS_DMG: modelBase.dmg_bonus += attr
+
+    return modelBase
+
+def find_char_attr(char:Character, property_id, attr_base, attr_final):
+    match property_id:
+        case CharAttributeID.HP: char.hp_base = attr_base
+        case CharAttributeID.ATK: char.atk_base = attr_base
+        case CharAttributeID.DEF: char.def_base = attr_base
+        case CharAttributeID.IMPACT: char.impact = attr_final
+        case CharAttributeID.CRIT_RATE: char.crit_rate += attr_base
+        case CharAttributeID.CRIT_DMG: char.crit_dmg += attr_base
+        case CharAttributeID.ANOMALY_MAST: char.anomaly_mastery = attr_base
+        case CharAttributeID.ANOMALY_PROF: char.anomaly_prof = attr_final
+        case CharAttributeID.PEN: char.pen = attr_base  
+        case CharAttributeID.ENERGY_REGEN: char.energy_regen = attr_base
+        
+    return char
 
 
 class ServiceCharacter():
     def __init__(self, url):
         raw_data = load_json(url)
-        self.equip_data = raw_data['data']['avatar_list'][0]
-        self.atk_weapon_base = int(raw_data['data']['avatar_list'][0]['weapon']['main_properties'][0]['base'])
+        self.avatar_data = raw_data['data']['avatar_list'][0]
+        #self.atk_weapon_base = int(self.avatar_data['weapon']['main_properties'][0]['base'])
 
     def build_character(self):
-        serviceDiscs = ServiceDiscs(self.equip_data['equip'])
-        serviceWEngine = ServiceWEngine(self.equip_data['weapon'])
+        serviceDiscs = ServiceDiscs(self.avatar_data['equip'])
+        serviceWEngine = ServiceWEngine(self.avatar_data['weapon'])
 
         disc:Disc = serviceDiscs.build_discs_data()
         wengine:WEngine = serviceWEngine.build_wengine_data()
-        char:Character = self.build_char_base_data()
+        char =self.build_char_base_data()
         char.equip_discs(disc)
         char.equip_wengine(wengine)
         char = self.fix_data(char)
@@ -68,24 +113,13 @@ class ServiceCharacter():
         return char
 
     def build_char_base_data(self) -> Character:
-        char = Character({'LVL':60})
+        char = Character()
+        char.lvl = int(self.avatar_data['level'])
 
-        for prop in self.equip_data['properties']:
+        for prop in self.avatar_data['properties']:
             attr_base = remove_perc(prop['base'])
             attr_final =remove_perc(prop['final'])
-            match prop['property_name']:
-                case "HP": char.hp_base = attr_base
-                case "ATK": char.atk_base = attr_base
-                case "DEF": char.def_base = attr_base
-                case "Impact": char.impact = attr_final
-                case "CRIT Rate": char.crit_rate += attr_base
-                case "CRIT DMG": char.crit_dmg += attr_base
-                case "Anomaly Mastery": char.anomaly_mastery = attr_base
-                case "Anomaly Proficiency": char.anomaly_prof = attr_final
-                case "PEN Ratio": char.pen = attr_base  
-                case "Energy Regen": char.energy_regen = attr_base
-                case "PEN": char.pen = attr_base
-                case "Physical DMG Bonus": char.dm = attr_base
+            find_char_attr(char, int(prop['property_id']), attr_base, attr_final)
         
         return char
 
@@ -95,26 +129,14 @@ class ServiceWEngine():
         self.equip_data = json_data
 
     def build_wengine_data(self) -> WEngine:
-        wEngine = WEngine({})
+        wEngine = WEngine()
         main_stat = self.equip_data['main_properties'][0]['base']
         wEngine.atk_base = remove_perc(main_stat)
 
         second_stat = self.equip_data['properties'][0]
         attr = remove_perc(second_stat['base'])
 
-        match second_stat['property_id']:
-            case AttributeID.ANOMALY_MAST: wEngine.anomaly_mastery += attr
-            case AttributeID.ANOMALY_PROF: wEngine.anomaly_prof += attr
-            case AttributeID.ATK_BASE: wEngine.atk_base += attr
-            case AttributeID.ATK: wEngine.atk += attr
-            case AttributeID.CRIT_DMG: wEngine.crit_dmg += attr
-            case AttributeID.CRIT_RATE: wEngine.crit_rate += attr
-            case AttributeID.DEF: wEngine.defense += attr
-            case AttributeID.DEF_FLAT: wEngine.defense_flat += attr
-            case AttributeID.HP: wEngine.hp += attr
-            case AttributeID.PEN: wEngine.pen += attr
-            case AttributeID.PEN_FLAT: wEngine.pen_flat += attr
-            case AttributeID.PHYS_DMG: wEngine.dmg_bonus += attr
+        wEngine = find_attr(wEngine, second_stat['property_id'], attr)
         
         return wEngine
 
@@ -124,13 +146,19 @@ class ServiceDiscs():
     
 
     def build_discs_data(self) -> Disc:
-        disc = Disc({})
+        disc = Disc()
         equip_suit_list = []
         sets = {}
         for equip in self.equip_data:
-            for attr in equip['properties']:
-                disc = self.add_attribute(disc, attr)
-            disc = self.add_attribute(disc, equip['main_properties'][0])
+            for attr_dict in equip['properties']:
+                attr = remove_perc(attr_dict['base'])
+                property_id = attr_dict['property_id']
+                disc = find_attr(disc, property_id, attr)
+                # disc = self.add_attribute(disc, attr_dict)
+
+            main_prop = equip['main_properties'][0]
+            attr = remove_perc(main_prop['base'])
+            disc = find_attr(disc, main_prop['property_id'], attr)
             equip_suit_list.append(equip["equip_suit"])
 
         for equip_suit in equip_suit_list:
