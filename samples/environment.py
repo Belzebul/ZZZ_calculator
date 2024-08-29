@@ -1,6 +1,5 @@
-from jane_doe import JaneDoe
 from enemy import Enemy, EnemyType
-from model_ZZZ import Character,Disc,WEngine
+from model_ZZZ import Character
 from services import ServiceCharacter
 
 URL_PIPER_DATA = 'Piper_data.json'

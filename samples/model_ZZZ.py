@@ -3,6 +3,34 @@ def getData(data,key):
         return data[key]
     return 0
 
+class AttributeID():
+    HP = 11102
+    HP_FLAT = 11103
+    ATK_BASE = 12101
+    ATK = 12102
+    ATK_FLAT = 12103
+    DEF = 13102
+    DEF_FLAT = 13103
+    CRIT_RATE = 20103
+    CRIT_DMG = 21103
+    PEN_FLAT = 23203
+    PEN = 23103
+    ANOMALY_PROF = 31203
+    ANOMALY_MAST = 31402
+    PHYS_DMG = 31503
+
+class CharAttributeID():
+    HP = 1
+    ATK = 2
+    DEF = 3
+    IMPACT = 4
+    CRIT_RATE = 5
+    CRIT_DMG = 6
+    ANOMALY_MAST = 7
+    ANOMALY_PROF = 8
+    PEN = 9
+    ENERGY_REGEN = 10
+
 class ModelBase():
     lvl = 1
     hp = 0.0
@@ -35,6 +63,23 @@ class ModelBase():
     def __init__(self) -> None:
         pass
 
+    def set_attr_from_id(self, property_id, attr):
+        match property_id:
+            case AttributeID.HP: self.hp += attr
+            case AttributeID.HP_FLAT: self.hp_flat += attr
+            case AttributeID.ATK_BASE: self.atk_base += attr
+            case AttributeID.ATK: self.atk += attr
+            case AttributeID.ATK_FLAT: self.atk_flat += attr
+            case AttributeID.DEF: self.defense += attr
+            case AttributeID.DEF_FLAT: self.defense_flat += attr
+            case AttributeID.CRIT_RATE: self.crit_rate += attr
+            case AttributeID.CRIT_DMG: self.crit_dmg += attr
+            case AttributeID.PEN: self.pen += attr
+            case AttributeID.PEN_FLAT: self.pen_flat += attr
+            case AttributeID.ANOMALY_MAST: self.anomaly_mastery += attr
+            case AttributeID.ANOMALY_PROF: self.anomaly_prof += attr
+            case AttributeID.PHYS_DMG: self.dmg_bonus += attr
+
 class DamageType():
     ELECTRIC = 0 
     FIRE = 1
@@ -61,6 +106,19 @@ class WEngine(ModelBase):
 class Character(ModelBase):
     def __init__(self) -> None:
         super().__init__()
+
+    def find_char_attr(self, property_id, attr_base, attr_final):
+        match property_id:
+            case CharAttributeID.HP: self.hp_base = attr_base
+            case CharAttributeID.ATK: self.atk_base = attr_base
+            case CharAttributeID.DEF: self.def_base = attr_base
+            case CharAttributeID.IMPACT: self.impact = attr_final
+            case CharAttributeID.CRIT_RATE: self.crit_rate += attr_base
+            case CharAttributeID.CRIT_DMG: self.crit_dmg += attr_base
+            case CharAttributeID.ANOMALY_MAST: self.anomaly_mastery = attr_base
+            case CharAttributeID.ANOMALY_PROF: self.anomaly_prof = attr_final
+            case CharAttributeID.PEN: self.pen = attr_base  
+            case CharAttributeID.ENERGY_REGEN: self.energy_regen = attr_base
 
     def equip_discs(self, disc:Disc):
         self.discs = disc

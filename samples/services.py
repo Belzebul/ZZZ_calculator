@@ -50,46 +50,10 @@ def remove_perc(attr_str):
         attr = pattern.findall(attr_str)[0]
         return float(attr) if attr != '' else 0.0
 
-def find_attr(modelBase:ModelBase, property_id, attr):
-    match property_id:
-        case AttributeID.HP: modelBase.hp += attr
-        case AttributeID.HP_FLAT: modelBase.hp_flat += attr
-        case AttributeID.ATK_BASE: modelBase.atk_base += attr
-        case AttributeID.ATK: modelBase.atk += attr
-        case AttributeID.ATK_FLAT: modelBase.atk_flat += attr
-        case AttributeID.DEF: modelBase.defense += attr
-        case AttributeID.DEF_FLAT: modelBase.defense_flat += attr
-        case AttributeID.CRIT_RATE: modelBase.crit_rate += attr
-        case AttributeID.CRIT_DMG: modelBase.crit_dmg += attr
-        case AttributeID.PEN: modelBase.pen += attr
-        case AttributeID.PEN_FLAT: modelBase.pen_flat += attr
-        case AttributeID.ANOMALY_MAST: modelBase.anomaly_mastery += attr
-        case AttributeID.ANOMALY_PROF: modelBase.anomaly_prof += attr
-        case AttributeID.PHYS_DMG: modelBase.dmg_bonus += attr
-
-    return modelBase
-
-def find_char_attr(char:Character, property_id, attr_base, attr_final):
-    match property_id:
-        case CharAttributeID.HP: char.hp_base = attr_base
-        case CharAttributeID.ATK: char.atk_base = attr_base
-        case CharAttributeID.DEF: char.def_base = attr_base
-        case CharAttributeID.IMPACT: char.impact = attr_final
-        case CharAttributeID.CRIT_RATE: char.crit_rate += attr_base
-        case CharAttributeID.CRIT_DMG: char.crit_dmg += attr_base
-        case CharAttributeID.ANOMALY_MAST: char.anomaly_mastery = attr_base
-        case CharAttributeID.ANOMALY_PROF: char.anomaly_prof = attr_final
-        case CharAttributeID.PEN: char.pen = attr_base  
-        case CharAttributeID.ENERGY_REGEN: char.energy_regen = attr_base
-        
-    return char
-
-
 class ServiceCharacter():
     def __init__(self, url):
         raw_data = load_json(url)
         self.avatar_data = raw_data['data']['avatar_list'][0]
-        #self.atk_weapon_base = int(self.avatar_data['weapon']['main_properties'][0]['base'])
 
     def build_character(self):
         serviceDiscs = ServiceDiscs(self.avatar_data['equip'])
@@ -103,7 +67,6 @@ class ServiceCharacter():
         char = self.fix_data(char)
 
         return char
-
 
     def fix_data(self, char: Character):
         char.atk_base -= char.wengine.atk_base
@@ -119,7 +82,7 @@ class ServiceCharacter():
         for prop in self.avatar_data['properties']:
             attr_base = remove_perc(prop['base'])
             attr_final =remove_perc(prop['final'])
-            find_char_attr(char, int(prop['property_id']), attr_base, attr_final)
+            char.set_attr_from_id(int(prop['property_id']), attr_base, attr_final)
         
         return char
 
@@ -135,9 +98,8 @@ class ServiceWEngine():
 
         second_stat = self.equip_data['properties'][0]
         attr = remove_perc(second_stat['base'])
+        wEngine.set_attr_from_id(second_stat['property_id'], attr)
 
-        wEngine = find_attr(wEngine, second_stat['property_id'], attr)
-        
         return wEngine
 
 class ServiceDiscs():
@@ -153,12 +115,11 @@ class ServiceDiscs():
             for attr_dict in equip['properties']:
                 attr = remove_perc(attr_dict['base'])
                 property_id = attr_dict['property_id']
-                disc = find_attr(disc, property_id, attr)
-                # disc = self.add_attribute(disc, attr_dict)
+                disc.set_attr_from_id(property_id, attr)
 
             main_prop = equip['main_properties'][0]
             attr = remove_perc(main_prop['base'])
-            disc = find_attr(disc, main_prop['property_id'], attr)
+            disc.set_attr_from_id(main_prop['property_id'], attr)
             equip_suit_list.append(equip["equip_suit"])
 
         for equip_suit in equip_suit_list:
@@ -177,31 +138,6 @@ class ServiceDiscs():
             disc.pen = 8
 
         return disc
-
-    def add_attribute(self, disc: Disc, attr_dict):
-        attr = remove_perc(attr_dict['base'])
-        match attr_dict['property_id']:
-            case AttributeID.ANOMALY_MAST: disc.anomaly_mastery += attr
-            case AttributeID.ANOMALY_PROF: disc.anomaly_prof += attr
-            case AttributeID.ATK: disc.atk += attr
-            case AttributeID.ATK_FLAT: disc.atk_flat += attr
-            case AttributeID.CRIT_DMG: disc.crit_dmg += attr
-            case AttributeID.CRIT_RATE: disc.crit_rate += attr
-            case AttributeID.DEF: disc.defense += attr
-            case AttributeID.DEF_FLAT: disc.defense_flat += attr
-            case AttributeID.HP_FLAT: disc.hp_flat += attr
-            case AttributeID.HP: disc.hp += attr
-            case AttributeID.PEN: disc.pen += attr
-            case AttributeID.PEN_FLAT: disc.pen_flat += attr
-            case AttributeID.PHYS_DMG: disc.dmg_bonus += attr
-
-        return disc
-    
-
-    def get_equip_data(self, raw_data):
-        # return self.equips_data
-        pass
-
 
 if __name__ == '__main__':
     serviceCharacter = ServiceCharacter(URL)
