@@ -1,6 +1,6 @@
 from enemy import Enemy, EnemyType
 from model_ZZZ import Character
-from services import ServiceCharacter
+from services_hoyolab import ServiceCharacter
 
 URL_PIPER_DATA = 'Piper_data.json'
 
@@ -14,28 +14,6 @@ janedoe.anomaly_mastery = 150
 janedoe.anomaly_prof = 112
 janedoe.energy_regen = 1.2
 
-
-PIPER_DISCS_DATA = {
-    'HP_FLAT': 2200 + 112 + 224,
-    'HP': 6,
-    'ATK_FLAT': 316 + 19,
-    'ATK': 3 + 6 + 9 + 9,
-    'CR': 7.2 + 7.2 + 2.4,
-    'CD': 9.6,
-    'DEF_FLAT': 184 + 45 + 15 + 45 + 30,
-    'DEF': 4.8,
-    'PEN_FLAT':27 + 18 + 18,
-    'DMG_BONUS':30,
-    'ANOMALY_PROF': 30 + 18 + 18 + 18 + 92 + 27,
-    'ANOMALY_MASTERY': 30,
-    'ER': 20
-}
-
-PIPER_WENGINE_DATA = {
-    'ATK_BASE': 624,
-    'ATK': 25
-}
-
 class Anomaly():
     BURN = 0.5
     SHOCK = 1.25
@@ -44,7 +22,7 @@ class Anomaly():
     ASSAULT = 7.13
 
 def normal_hit(enemy:Enemy,char:Character, skill):
-    '''dano'''
+    '''dano de skills'''
     pass
 
 def anomaly_hit(enemy:Enemy, char:Character, anomalyType:float):

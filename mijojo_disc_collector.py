@@ -1,7 +1,4 @@
-#from typing import List
-#from bs4 import BeautifulSoup
-#from bs4.element import Tag
-import requests
+import requests 
 import json
 
 USER_ID = ''
@@ -10,22 +7,25 @@ LTUID_V2 = ''
 TOKEN = f'ltoken_v2={LTOKEN_V2};ltuid_v2={LTUID_V2};'
 
 HTTP_OK = 200
-URL_CHAR_LIST = 'https://sg-act-nap-api.hoyolab.com/event/game_record_zzz/api/zzz/avatar/basic?server=prod_gf_us&role_id='
+URL_LIST_BASE = 'https://sg-act-nap-api.hoyolab.com'
+URL_LIST_BASE_OPTIONS = '/event/game_record_zzz/api/zzz/avatar/basic?server=prod_gf_us&role_id='
 URL_CHAR_DATA = 'https://sg-act-nap-api.hoyolab.com/event/game_record_zzz/api/zzz/avatar/info?id_list[]='
 URL_CHAR_OPTIONS = '&need_wiki=true&server=prod_gf_us&role_id='
 
 HEADERS = {
     'Cookie':TOKEN,
-    'Accept': '*/*',
-    'user-agent': ('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36 Edg/127.0.0.0'),
+    'Accept': 'application/json, text/plain, */*',
+    'Accept-Encoding': 'gzip, deflate, br, zstd',
+    'x-rpc-app_version': '2.34.1',
+    'user-agent': ('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36 Edg/128.0.0.0'),
+    'x-rpc-client_type': '4',
     'Referer': 'https://act.hoyolab.com/',
     'Origin': 'https://act.hoyolab.com'}
 
 class CharacterHTMLCollector:
 
     def __init__(self):
-
-        json_resquested_chars_name = json.loads(self.http_content(URL_CHAR_LIST + USER_ID))
+        json_resquested_chars_name = json.loads(self.http_content(URL_LIST_BASE + URL_LIST_BASE_OPTIONS + USER_ID))
         json_char_list = json_resquested_chars_name['data']['avatar_list']
         chars_data_list = self.load_chars_data(json_char_list)
         self.write_char_files(chars_data_list)

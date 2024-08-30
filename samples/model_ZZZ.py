@@ -107,7 +107,7 @@ class Character(ModelBase):
     def __init__(self) -> None:
         super().__init__()
 
-    def find_char_attr(self, property_id, attr_base, attr_final):
+    def set_attr_from_id(self, property_id, attr_base, attr_final):
         match property_id:
             case CharAttributeID.HP: self.hp_base = attr_base
             case CharAttributeID.ATK: self.atk_base = attr_base

@@ -2,42 +2,10 @@ from model_ZZZ import Character, Disc, WEngine, ModelBase
 import json
 import re
 
-URL = 'Piper_data.json'
-
-
 class DiscSetID():
     PUFFER_ELECTRO = 31100
     FREEDOM_BLUE = 31300
     SWING_JAZZ = 31600
-
-class AttributeID():
-    HP = 11102
-    HP_FLAT = 11103
-    ATK_BASE = 12101
-    ATK = 12102
-    ATK_FLAT = 12103
-    DEF = 13102
-    DEF_FLAT = 13103
-    CRIT_RATE = 20103
-    CRIT_DMG = 21103
-    PEN_FLAT = 23203
-    PEN = 23103
-    ANOMALY_PROF = 31203
-    ANOMALY_MAST = 31402
-    PHYS_DMG = 31503
-
-class CharAttributeID():
-    HP = 1
-    ATK = 2
-    DEF = 3
-    IMPACT = 4
-    CRIT_RATE = 5
-    CRIT_DMG = 6
-    ANOMALY_MAST = 7
-    ANOMALY_PROF = 8
-    PEN = 9
-    ENERGY_REGEN = 10
-
 
 def load_json(json_url):
         with open(json_url, 'r', encoding="utf-8") as file:
@@ -61,7 +29,7 @@ class ServiceCharacter():
 
         disc:Disc = serviceDiscs.build_discs_data()
         wengine:WEngine = serviceWEngine.build_wengine_data()
-        char =self.build_char_base_data()
+        char = self.build_char_base_data()
         char.equip_discs(disc)
         char.equip_wengine(wengine)
         char = self.fix_data(char)
@@ -140,6 +108,7 @@ class ServiceDiscs():
         return disc
 
 if __name__ == '__main__':
+    URL = 'Piper_data.json'
     serviceCharacter = ServiceCharacter(URL)
     char = serviceCharacter.build_character()
     print("")
