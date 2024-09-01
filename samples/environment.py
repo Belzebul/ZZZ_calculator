@@ -1,8 +1,10 @@
 from enemy import Enemy, EnemyType
 from model_ZZZ import Character
+from services_hakushin import CharacterBuilder
 from services_hoyolab import ServiceCharacter
 
-URL_PIPER_DATA = 'Piper_data.json'
+URL_PIPER_DATA = 'hoyolab_data/Piper_data.json'
+URL_GRACE_DATA = 'hoyolab_data/Grace_data.json'
 
 janedoe = Character()
 janedoe.lvl = 60
@@ -37,22 +39,20 @@ def anomaly_hit(enemy:Enemy, char:Character, anomalyType:float):
 
 if __name__ == '__main__':
     #importar dados do arquivo
-    serviceCharacter = ServiceCharacter(URL_PIPER_DATA)
+    serviceCharacter = ServiceCharacter(URL_GRACE_DATA)
+    serviceCharacter2 = ServiceCharacter(URL_PIPER_DATA)
 
     #estruturar dados do personagem
-    char = serviceCharacter.build_character()
-    janedoe.equip_discs(char.discs)
-    janedoe.equip_wengine(char.wengine)
+    char_grace = serviceCharacter.build_character()
+    char_piper = serviceCharacter2.build_character()
+    wengine = char_piper.wengine
+    grace = CharacterBuilder('Grace',60, 5).build()
+    grace.equip_discs(char_grace.discs)
+    grace.equip_wengine(char_piper.wengine)
 
     #carrega inimigo
     durahan = Enemy(EnemyType.DURAHAN, 70)
 
-    # dmg1 = normal_hit(durahan, janedoe, janedoe.skill())
-
-    #calcula o dano
-    dmg = anomaly_hit(durahan, janedoe, Anomaly.ASSAULT)
-    dmg_piper = anomaly_hit(durahan, char, Anomaly.ASSAULT)
-
     #output
-    print(f'dmg: {dmg:.2f}')
-    print(f'dmg: {dmg_piper:.2f}')
+    grace.print_stats()
+    pass

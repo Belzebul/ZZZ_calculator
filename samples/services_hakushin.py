@@ -1,5 +1,6 @@
 import json
 from model_ZZZ import Character
+import model_ZZZ
 
 CHAR_LIST_CODES = ['Corin', 'QingYi', 'Jane', 'Soukaku', 'Harumasa', 'Billy', 'Grace', 'Wise', 'Anby', 'Caesar', 'Belle', 'Nicole', 'Piper', 'Nekomata', 'Zhu Yuan', 'Lycaon', 'Lighter', 'Anton', 'Soldier 11', 'Miyabi', 'Ben', 'Rina', 'Avatar_Female_Size03_Pulchra_En', 'Lucy', 'Koleda', 'Yanagi', 'Seth', 'Burnice', 'Ellen']
 
@@ -10,13 +11,14 @@ class CharacterBuilder():
         servicesHakushin = ServicesHakushin()
         self.char_base_dict = servicesHakushin.char_base_stats[code]
         self.set_stats_base(char_lvl)
+        self.set_core(skills_lvl[0])
 
     def build(self):
         return self.char
 
     def set_stats_base(self, lvl):
         self.char.atk_base = self.find_stat_base(lvl,'Attack','AttackGrowth')
-        self.char.def_base = self.find_stat_base(lvl,'Defence','DefenceGrowth')
+        self.char.defense_base = self.find_stat_base(lvl,'Defence','DefenceGrowth')
         self.char.hp_base = self.find_stat_base(lvl,'HpMax','HpGrowth')
         self.char.anomaly_mastery = self.char_base_dict['Stats']['ElementMystery']
         self.char.anomaly_prof = self.char_base_dict['Stats']['ElementAbnormalPower']
@@ -34,6 +36,13 @@ class CharacterBuilder():
         lvl_range = self.get_lvl_range(lvl)
         ascension_bonus = self.char_base_dict['Level'][lvl_range][stat_name]
         return stat_base + (lvl-1) * stat_growth + ascension_bonus
+    
+    def set_core(self, lvl):
+        core_stats = self.char_base_dict['ExtraLevel'][str(lvl)]['Extra']
+        for stat in core_stats.values():
+            self.char.set_attr_from_id(stat['Prop'], stat['Value'])
+            #self.char = model_ZZZ.set_char_attr_from_id(self.char, stat['Prop'], stat['Value'])
+
 
     def get_lvl_range(self, lvl):
         if lvl > 50: return '6'
@@ -60,7 +69,7 @@ class ServicesHakushin():
         return raw_data
     
 if __name__ == '__main__':
-    characterBuilder = CharacterBuilder('Grace',60,1)
+    characterBuilder = CharacterBuilder('Grace',60,6)
     char = characterBuilder.build()
     pass
     

@@ -50,7 +50,7 @@ class ServiceCharacter():
         for prop in self.avatar_data['properties']:
             attr_base = remove_perc(prop['base'])
             attr_final =remove_perc(prop['final'])
-            char.set_attr_from_id(int(prop['property_id']), attr_base, attr_final)
+            char.set_char_attr_from_id(int(prop['property_id']), attr_base, attr_final)
         
         return char
 
@@ -108,7 +108,7 @@ class ServiceDiscs():
         return disc
 
 if __name__ == '__main__':
-    URL = 'Piper_data.json'
+    URL = 'hoyolab_data/Piper_data.json'
     serviceCharacter = ServiceCharacter(URL)
     char = serviceCharacter.build_character()
     print("")
