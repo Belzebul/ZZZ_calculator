@@ -1,4 +1,5 @@
-from model_ZZZ import Character, Disc, WEngine, ModelBase
+from models import Character, Disc, WEngine
+from services_hakushin import CharacterBuilder
 import json
 import re
 
@@ -32,27 +33,25 @@ class ServiceCharacter():
         char = self.build_char_base_data()
         char.equip_discs(disc)
         char.equip_wengine(wengine)
-        char = self.fix_data(char)
-
-        return char
-
-    def fix_data(self, char: Character):
-        char.atk_base -= char.wengine.atk_base
-        char.anomaly_prof -= char.discs.anomaly_prof
-        char.impact -= char.discs.impact
 
         return char
 
     def build_char_base_data(self) -> Character:
-        char = Character()
-        char.lvl = int(self.avatar_data['level'])
-
-        for prop in self.avatar_data['properties']:
-            attr_base = remove_perc(prop['base'])
-            attr_final =remove_perc(prop['final'])
-            char.set_char_attr_from_id(int(prop['property_id']), attr_base, attr_final)
+        code = self.avatar_data['name_mi18n']
+        lvl = self.avatar_data['level']
+        skills = self.__getSkillsLvl(self.avatar_data['skills'])
+        char = CharacterBuilder(code, lvl, skills).build()
         
         return char
+    
+    def __getSkillsLvl(self, skills:dict):
+        skillsList = []
+        for skill in skills:
+            skillsList.append(skill['level'])
+
+        return tuple(skillsList)
+
+
 
 
 class ServiceWEngine():
@@ -62,7 +61,7 @@ class ServiceWEngine():
     def build_wengine_data(self) -> WEngine:
         wEngine = WEngine()
         main_stat = self.equip_data['main_properties'][0]['base']
-        wEngine.atk_base = remove_perc(main_stat)
+        wEngine.atk = remove_perc(main_stat)
 
         second_stat = self.equip_data['properties'][0]
         attr = remove_perc(second_stat['base'])
@@ -108,7 +107,10 @@ class ServiceDiscs():
         return disc
 
 if __name__ == '__main__':
-    URL = 'hoyolab_data/Piper_data.json'
+    URL = 'hoyolab_data/Grace_data.json'
     serviceCharacter = ServiceCharacter(URL)
     char = serviceCharacter.build_character()
     print("")
+
+
+#basic, special, dodge, chain, core, assist

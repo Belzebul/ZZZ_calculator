@@ -43,7 +43,7 @@ class HoyolabCharacterDataScraper:
         return char_json_list
 
     def write_files(self, chars_data_list):
-        path = Path(__file__).parent.parent.resolve() / 'hoyolab_data'
+        path = Path(__file__).parent.parent.parent.resolve() / 'hoyolab_data'
         Path(path).mkdir(parents=True, exist_ok=True)
         for char_data in chars_data_list:
             self.__write_json_to_file(path, char_data)
@@ -57,4 +57,5 @@ class HoyolabCharacterDataScraper:
     
 if __name__ == '__main__':
     webscraper = HoyolabCharacterDataScraper()
-    webscraper.write_files(webscraper.chars_data)
+    # webscraper.write_files(webscraper.chars_data)
+    pass
