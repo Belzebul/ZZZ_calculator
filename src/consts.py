@@ -43,6 +43,13 @@ class EnemyType:
     DEATH_XIII = 45
     #TODO
 
+class AnomalyType:
+    PHYSICAL = 15
+    FIRE = 16
+    ICE = 17
+    ELECTRO = 18
+    ETHER = 19
+
 class Anomaly:
     BURN = 0.5
     SHOCK = 1.25

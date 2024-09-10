@@ -1,8 +1,7 @@
 from pathlib import Path
 from enemy import Enemy, EnemyType
-from models import Character, Hit
-from consts import Anomaly, CharacterNames
-from services_hakushin import CharacterBuilder
+from models import Action, Character
+from consts import CharacterNames
 from services_hoyolab import ServiceCharacter
 
 URL_GRACE_DATA = 'hoyolab_data/Grace_data.json'
@@ -30,9 +29,9 @@ def anomaly_hit_dmg(enemy:Enemy, char:Character, anomaly_type_mult:float):
 
     return dmg
 
-def skill_hit_dmg(enemy:Enemy, char:Character, hit:Hit):
-    base_dmg = hit.mult_dmg/100 * char.get_atk()
-    dmg_bonus_mult = 1 + (char.get_dmg_bonus() / 100)
+def skill_hit_dmg(enemy:Enemy, char:Character, action:Action):
+    base_dmg = action.dmg.get_mult(action.lvl) * char.get_atk()
+    dmg_bonus_mult = 1 + (char.get_phys_bonus() / 100)
     crit_mult = 1 #+ (char.get_crit_rate()*char.get_crit_dmg())
     enemy_def = enemy.get_defense(char)
     dmg = base_dmg * dmg_bonus_mult * crit_mult * enemy_def * enemy.RES_mult * enemy.DMG_TAKEN_MULT * enemy.STUN_MULT
@@ -60,7 +59,8 @@ if __name__ == '__main__':
     #calcular dano de teste
     ELECTRO_DMG_BONUS = 1.3
     WENGINE_SKILL = 1.12
-    dmg = [skill_hit_dmg(durahan, grace, dmg)*WENGINE_SKILL for dmg in grace.basic.hits]
+    grace.basic.actions
+    dmg = [skill_hit_dmg(durahan, grace, action)*WENGINE_SKILL for action in grace.basic.actions]
     
     dmg3_1 = dmg[2] * 2/5
     dmg3_2 = dmg[2] * 3/5 * ELECTRO_DMG_BONUS

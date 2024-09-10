@@ -1,4 +1,4 @@
-from consts import AttributeID
+from consts import AnomalyType, AttributeID
 
 class ModelBase():
     lvl:int = 1
@@ -27,12 +27,11 @@ class ModelBase():
     anomaly_prof:float = 0.0
     anomaly_mastery:float = 0.0
 
-    dmg_bonus:float = 0.0
-    phys_dmg:float = 0.0
-    elec_dmg:float = 0.0
-    ether_dmg:float = 0.0
-    fire_dmg:float = 0.0
-    ice_dmg:float = 0.0
+    phys_bonus:float = 0.0
+    elec_bonus:float = 0.0
+    ether_bonus:float = 0.0
+    fire_bonus:float = 0.0
+    ice_bonus:float = 0.0
 
     def __init__(self) -> None:
         pass
@@ -68,32 +67,39 @@ class ModelBase():
             case AttributeID.ANOMALY_PROF_BASE: self.anomaly_prof += attr
             case AttributeID.ANOMALY_PROF: self.anomaly_prof += attr
 
-            case AttributeID.PHYS_DMG: self.phys_dmg += attr
-            case AttributeID.FIRE_DMG: self.fire_dmg += attr
-            case AttributeID.ELEC_DMG: self.elec_dmg += attr
-            case AttributeID.ICE_DMG: self.ice_dmg += attr
-            case AttributeID.ETHER_DMG: self.ether_dmg += attr
+            case AttributeID.PHYS_DMG: self.phys_bonus += attr
+            case AttributeID.FIRE_DMG: self.fire_bonus += attr
+            case AttributeID.ICE_DMG: self.ice_bonus += attr
+            case AttributeID.ELEC_DMG: self.elec_bonus += attr
+            case AttributeID.ETHER_DMG: self.ether_bonus += attr
 
-        
-'''
-TODO
-class DamageType():
-    PHYS = 0
-    ELEC = 1 
-    FIRE = 2
-'''
 
-class Hit():
-    def __init__(self, mult_dmg, mult_daze, dmg_type = [0]) -> None:
-        self.mult_dmg = mult_dmg
-        self.mult_daze = mult_daze
-        self.split = []
-        self.dmg_type = dmg_type
 
-class Skill():
+class Hit:
+    def __init__(self, quantity = 1, anomaly = AnomalyType.PHYSICAL ) -> None:
+        self.quantity = quantity
+        self.anomaly = anomaly
+        pass
+
+class Multiplier:
+    def __init__(self, base, growth) -> None:
+        self.base = base
+        self.growth = growth
+
+    def get_mult(self, lvl):
+        return (self.base + (lvl - 1) * self.growth)/100
+
+class Action:
+    def __init__(self, lvl, dmg:Multiplier, daze:Multiplier, hits) -> None:
+        self.lvl = lvl
+        self.dmg = dmg
+        self.daze = daze
+        self.hits = hits
+
+class Skill:
     def __init__(self, lvl = 1) -> None:
        self.lvl = lvl
-       self.hits = []       
+       self.actions = []       
 
 class Equip:
 
@@ -111,14 +117,17 @@ class WEngine(ModelBase):
         super().__init__()
 
 class Character(ModelBase):
+    basic = Skill()
+    dodge = Skill()
+    assist = Skill()
+    special = Skill()
+    chain = Skill()
+    core = Skill()
+    wengine = WEngine()
+    discs = Disc()
+
     def __init__(self) -> None:
         super().__init__()
-        self.basic = Skill()
-        self.dodge = Skill()
-        self.assist = Skill()
-        self.special = Skill()
-        self.chain = Skill()
-        self.core = Skill()
 
     def equip_discs(self, disc:Disc):
         self.discs = disc
@@ -137,7 +146,7 @@ class Character(ModelBase):
         return self.defense * (1 + (self.def_perc + self.discs.def_perc + self.wengine.def_perc)/100) + self.discs.defense
     
     def get_anomaly_prof(self):
-        return (self.anomaly_prof + self.wengine.anomaly_prof + self.discs.anomaly_prof)
+        return self.anomaly_prof + self.wengine.anomaly_prof + self.discs.anomaly_prof
     
     def get_crit_rate(self):
         return (self.crit_rate + self.wengine.crit_rate + self.discs.crit_rate)/100
@@ -156,19 +165,28 @@ class Character(ModelBase):
 
     def get_pen_flat(self):
         return self.wengine.pen_flat + self.discs.pen_flat
+    
+    def get_phys_bonus(self):
+        return self.phys_bonus + self.wengine.phys_bonus + self.discs.phys_bonus
 
-    def get_elec_dmg(self):
-        return self.elec_dmg + self.wengine.elec_dmg + self.discs.elec_dmg
+    def get_fire_bonus(self):
+        return self.fire_bonus + self.wengine.fire_bonus + self.discs.fire_bonus
+    
+    def get_ice_bonus(self):
+        return self.ice_bonus + self.wengine.ice_bonus + self.discs.ice_bonus
 
-    def get_dmg_bonus(self):
-        return self.dmg_bonus + self.wengine.dmg_bonus + self.discs.dmg_bonus
+    def get_elec_bonus(self):
+        return self.elec_bonus + self.wengine.elec_bonus + self.discs.elec_bonus
+    
+    def get_ether_bonus(self):
+        return self.ether_bonus + self.wengine.ether_bonus + self.discs.ether_bonus
 
     def get_lvl_factor(self):
         return 0.1551 * self.lvl**2 + 3.141 * self.lvl + 47.2039
   
     def print_stats(self):
         print(f'HP = {self.get_hp():.0f}')
-        print(f'ATK = {self.get_atk()*1.12:.0f}')
+        print(f'ATK = {self.get_atk():.0f}')
         print(f'DEF = {self.get_def():.0f}')
         print(f'impact = {self.impact:.0f}')
         print(f'CR = {self.get_crit_rate():.2f}')
@@ -178,4 +196,8 @@ class Character(ModelBase):
         print(f'PEN = {self.get_pen():.2f}')
         print(f'ER = {self.get_energy_regen():.2f}')
         print(f'PEN_FLAT = {self.get_pen_flat():.0f}')
-        print(f'electric dmg = {self.get_elec_dmg():.2f}')
+        print(f'phys dmg = {self.get_phys_bonus():.2f}')
+        print(f'fire dmg = {self.get_fire_bonus():.2f}')
+        print(f'ice dmg = {self.get_ice_bonus():.2f}')
+        print(f'electric dmg = {self.get_elec_bonus():.2f}')
+        print(f'ether dmg = {self.get_ether_bonus():.2f}')

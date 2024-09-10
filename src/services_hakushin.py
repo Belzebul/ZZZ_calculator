@@ -1,5 +1,6 @@
 import json
-from models import Character, Hit, Skill
+import math
+from models import Action, Character, Hit, Multiplier, Skill
 import consts
 
 class CharacterBuilder():
@@ -55,38 +56,31 @@ class CharacterBuilder():
     def load_skill_mult(self, skill, skill_dict, lvl):
         total_hits = int(len(skill_dict)/2)
         for index in range(total_hits):
-            mult_dmg = self.get_mult(lvl, skill_dict, index)
-            mult_daze = self.get_mult(lvl, skill_dict, index+total_hits)
-            skill.hits.append(Hit(mult_dmg,mult_daze))
+            dmg = self.build_multiplier(skill_dict, index)
+            daze = self.build_multiplier(skill_dict, index+total_hits)
+            hits = [Hit()]
+            action = Action(lvl, dmg, daze, hits)
+            skill.actions.append(action)
 
         return skill
 
-    def get_mult(self, lvl, skill_dict, index):
+    def build_multiplier(self, skill_dict, index):
         aux_dict:dict = skill_dict[index]['Param']
         param_dict = list(aux_dict.values())[0]
-        base = param_dict['Main']
-        growth = param_dict['Growth']
-        mult = base + (lvl - 1) * growth
-        return mult/100
-
-
+        base = param_dict['Main']/100
+        growth = param_dict['Growth']/100
+        mult = Multiplier(base, growth)
+        return mult
 
     def set_core_stats_base(self, lvl):
         core_stats = self.char_base_dict['ExtraLevel'][str(lvl-1)]['Extra']
         for stat in core_stats.values():
             self.char.set_attr_from_id(stat['Prop'], stat['Value'])
 
-
     def get_lvl_range(self, lvl):
-        if lvl > 50: return '6'
-        if lvl > 40: return '5'
-        if lvl > 30: return '4'
-        if lvl > 20: return '3'
-        if lvl > 10: return '2'
-        return '1'
-
+        return str(math.ceil(lvl/10))
+    
 class ServicesHakushin():
-
     def __init__(self) -> None:
       self.char_base_stats = {}
 
@@ -102,7 +96,8 @@ class ServicesHakushin():
         return raw_data
     
 if __name__ == '__main__':
-    characterBuilder = CharacterBuilder('Grace',60,12,12,12,12,12,6)
+    characterBuilder = CharacterBuilder('Grace',60,(12,12,12,12,7,12))
     char = characterBuilder.build()
+    char.print_stats()
     pass
     
