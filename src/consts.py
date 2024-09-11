@@ -44,11 +44,11 @@ class EnemyType:
     #TODO
 
 class AnomalyType:
-    PHYSICAL = 15
-    FIRE = 16
-    ICE = 17
-    ELECTRO = 18
-    ETHER = 19
+    PHYSICAL = 200
+    FIRE = 201
+    ICE = 202
+    ELECTRO = 203
+    ETHER = 205
 
 class Anomaly:
     BURN = 0.5

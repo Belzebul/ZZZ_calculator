@@ -1,6 +1,6 @@
 from pathlib import Path
 from enemy import Enemy, EnemyType
-from models import Action, Character
+from models import SubSkill, Character
 from consts import CharacterNames
 from services_hoyolab import ServiceCharacter
 
@@ -29,9 +29,9 @@ def anomaly_hit_dmg(enemy:Enemy, char:Character, anomaly_type_mult:float):
 
     return dmg
 
-def skill_hit_dmg(enemy:Enemy, char:Character, action:Action):
-    base_dmg = action.dmg.get_mult(action.lvl) * char.get_atk()
-    dmg_bonus_mult = 1 + (char.get_phys_bonus() / 100)
+def skill_hit_dmg(enemy:Enemy, char:Character, subSkill:SubSkill):
+    base_dmg = subSkill.dmg.get_mult(subSkill.lvl) * char.get_atk()
+    dmg_bonus_mult = char.get_bonus_mult(subSkill.hits.anomaly)
     crit_mult = 1 #+ (char.get_crit_rate()*char.get_crit_dmg())
     enemy_def = enemy.get_defense(char)
     dmg = base_dmg * dmg_bonus_mult * crit_mult * enemy_def * enemy.RES_mult * enemy.DMG_TAKEN_MULT * enemy.STUN_MULT
@@ -59,11 +59,12 @@ if __name__ == '__main__':
     #calcular dano de teste
     ELECTRO_DMG_BONUS = 1.3
     WENGINE_SKILL = 1.12
-    grace.basic.actions
-    dmg = [skill_hit_dmg(durahan, grace, action)*WENGINE_SKILL for action in grace.basic.actions]
+    dmg = [skill_hit_dmg(durahan, grace, subSkill)*WENGINE_SKILL for subSkill in grace.basic.subSkills]
     
     dmg3_1 = dmg[2] * 2/5
     dmg3_2 = dmg[2] * 3/5 * ELECTRO_DMG_BONUS
+
+    dmg_special = skill_hit_dmg(durahan, grace, grace.special.subSkills[1])*WENGINE_SKILL
 
     grace.print_stats()
     print(f'dmg basic 1: 3 x {dmg[0]/3:.2f}')
@@ -72,4 +73,5 @@ if __name__ == '__main__':
     print(f'dmg basic 3-2: 2 x {dmg3_2/2:.2f}')
     print(f'dmg basic 4: 8 x {dmg[3]/8:.2f}')
     print(f'dmg basic 5: 3 x {dmg[4]/3:.2f}')
+    print(f'dmg ex: 6 x {dmg_special/6:.2f}')
     pass

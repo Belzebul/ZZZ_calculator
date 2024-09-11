@@ -82,15 +82,16 @@ class Hit:
         pass
 
 class Multiplier:
-    def __init__(self, base, growth) -> None:
+    def __init__(self, base, growth, mult) -> None:
         self.base = base
         self.growth = growth
+        self.mult = mult
 
     def get_mult(self, lvl):
-        return (self.base + (lvl - 1) * self.growth)/100
+        return (self.base + (lvl-1)*self.growth)*self.mult/100
 
-class Action:
-    def __init__(self, lvl, dmg:Multiplier, daze:Multiplier, hits) -> None:
+class SubSkill:
+    def __init__(self, lvl, dmg:Multiplier, daze:Multiplier, hits:Hit) -> None:
         self.lvl = lvl
         self.dmg = dmg
         self.daze = daze
@@ -99,7 +100,7 @@ class Action:
 class Skill:
     def __init__(self, lvl = 1) -> None:
        self.lvl = lvl
-       self.actions = []       
+       self.subSkills = []       
 
 class Equip:
 
@@ -184,6 +185,16 @@ class Character(ModelBase):
     def get_lvl_factor(self):
         return 0.1551 * self.lvl**2 + 3.141 * self.lvl + 47.2039
   
+    def get_bonus_mult(self, anomalyType):
+        match anomalyType:
+            case AnomalyType.PHYSICAL: return 1 + self.get_phys_bonus()/100
+            case AnomalyType.FIRE: return 1 + self.get_fire_bonus()/100
+            case AnomalyType.ICE: return 1 + self.get_ice_bonus()/100
+            case AnomalyType.ELECTRO: return 1 + self.get_elec_bonus()/100
+            case AnomalyType.ETHER: return 1 + self.get_ether_bonus()/100
+
+
+
     def print_stats(self):
         print(f'HP = {self.get_hp():.0f}')
         print(f'ATK = {self.get_atk():.0f}')

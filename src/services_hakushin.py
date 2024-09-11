@@ -1,21 +1,24 @@
 import json
 import math
-from models import Action, Character, Hit, Multiplier, Skill
+from pathlib import Path
+import re
 import consts
+from consts import AnomalyType
+from models import SubSkill, Character, Hit, Multiplier, Skill
 
 class CharacterBuilder():
     def __init__(self, name, char_lvl:int, skills_lvl:tuple) -> None:
         '''skills lvl order: basic, special, dodge, chain, core, assist'''
-        self.char = Character()
-        
+        self.char = Character()        
         servicesHakushin = ServicesHakushin()
-        self.char_base_dict = servicesHakushin.char_base_stats[name]
+        self.char_base_dict = servicesHakushin.load_char_json(name)
         self.set_stats_base(char_lvl)
-        self.char.basic = self.set_skill(skills_lvl[0],'Basic')
-        self.char.dodge = self.set_skill(skills_lvl[2],'Dodge')
-        self.char.assist = self.set_skill(skills_lvl[5],'Assist')
-        self.char.special = self.set_skill(skills_lvl[1],'Special')
-        self.char.chain = self.set_skill(skills_lvl[3],'Chain')
+        anomalyType = int(list(self.char_base_dict['ElementType'].keys())[0])
+        self.char.basic = self.set_skill(skills_lvl[0],'Basic', AnomalyType.PHYSICAL)
+        self.char.dodge = self.set_skill(skills_lvl[2],'Dodge', anomalyType)
+        self.char.assist = self.set_skill(skills_lvl[5],'Assist', anomalyType)
+        self.char.special = self.set_skill(skills_lvl[1],'Special', anomalyType)
+        self.char.chain = self.set_skill(skills_lvl[3],'Chain', anomalyType)
         self.char.core = Skill(skills_lvl[4])
         self.set_core_stats_base(skills_lvl[4])
 
@@ -44,33 +47,40 @@ class CharacterBuilder():
         ascension_bonus = self.char_base_dict['Level'][lvl_range][stat_name]
         return stat_base + (lvl-1) * stat_growth + ascension_bonus
     
-    def set_skill(self, lvl, skill_code):
+    def set_skill(self, lvl, skill_code, anomalyType):
         skills_list:list = self.char_base_dict['Skill'][skill_code]['Description']
         skill = Skill(lvl)
         for skill_dict in skills_list:
             if 'Param' in skill_dict:
-                skill = self.load_skill_mult(skill, skill_dict['Param'], lvl)
+                skill = self.load_skill_mult(lvl, skill, skill_dict['Param'], anomalyType)
         
         return skill
 
-    def load_skill_mult(self, skill, skill_dict, lvl):
+    def load_skill_mult(self, lvl, skill, skill_dict, anomalyType):
         total_hits = int(len(skill_dict)/2)
         for index in range(total_hits):
             dmg = self.build_multiplier(skill_dict, index)
             daze = self.build_multiplier(skill_dict, index+total_hits)
-            hits = [Hit()]
-            action = Action(lvl, dmg, daze, hits)
-            skill.actions.append(action)
+            hits = Hit(1,anomalyType)
+            subSkill = SubSkill(lvl, dmg, daze, hits)
+            skill.subSkills.append(subSkill)
 
         return skill
 
     def build_multiplier(self, skill_dict, index):
+        mult = self.find_multiplier(skill_dict[index]['Desc'])
         aux_dict:dict = skill_dict[index]['Param']
         param_dict = list(aux_dict.values())[0]
         base = param_dict['Main']/100
         growth = param_dict['Growth']/100
-        mult = Multiplier(base, growth)
+        mult = Multiplier(base, growth, mult)
         return mult
+    
+    def find_multiplier(self, desc):
+        '''pattern pra pegar digitos depois de qqlr "}*"'''
+        pattern = re.compile(r'\}\*(\d*)')
+        matches = pattern.findall(desc)
+        return int(matches[0]) if len(matches) != 0 else 1
 
     def set_core_stats_base(self, lvl):
         core_stats = self.char_base_dict['ExtraLevel'][str(lvl-1)]['Extra']
@@ -83,14 +93,16 @@ class CharacterBuilder():
 class ServicesHakushin():
     def __init__(self) -> None:
       self.char_base_stats = {}
+      self.directory = Path(__file__).parent.parent.resolve() / 'character_database'
 
-      for names in consts.CHAR_LIST_CODES:
-          url = f'character_database/{names}.json'
-          char_data = self.load_json(url)
-          self.char_base_stats[names] = char_data
+    def load_all_characters(self):
+        for char_name in consts.CHAR_LIST_CODES:
+            char_data = self.load_char_json(char_name)
+            self.char_base_stats[char_name] = char_data
 
-    def load_json(self, json_url):
-        with open(json_url, 'r', encoding="utf-8") as file:
+    def load_char_json(self, name_char):
+        url = self.directory / f'{name_char}.json'
+        with open(url, 'r', encoding="utf-8") as file:
             raw_data = json.load(file)
 
         return raw_data
