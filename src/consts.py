@@ -1,40 +1,35 @@
-class AttributeID:
+from enum import IntEnum, StrEnum
+
+class AttributeID(IntEnum):
     HP_BASE = 11101
     HP_PERC = 11102
     HP_FLAT = 11103
-
     ATK_BASE = 12101
     ATK_PERC = 12102
     ATK_FLAT = 12103
-
     IMPACT = 12201
     IMPACT_PERC = 12202
-
     DEF_BASE = 13101
     DEF_PERC = 13102
     DEF_FLAT = 13103
-
     CRIT_RATE_BASE = 20101
     CRIT_RATE = 20103
     CRIT_DMG_BASE = 21101
     CRIT_DMG = 21103
-
     PEN_BASE = 23101
     PEN = 23103
     PEN_FLAT = 23203
-
     ANOMALY_PROF_BASE = 31201
     ANOMALY_PROF = 31203
     ANOMALY_MAST_BASE = 31401
     ANOMALY_MAST = 31402
-
     PHYS_DMG = 31503
     FIRE_DMG = 31603
     ICE_DMG = 31703
     ELEC_DMG = 31803
     ETHER_DMG = 31903
 
-class EnemyType:
+class EnemyType(IntEnum):
     DURAHAN = 58
     TYRFING = 36
     THUG_ASSAULT = 37
@@ -43,7 +38,7 @@ class EnemyType:
     DEATH_XIII = 45
     #TODO
 
-class AnomalyType:
+class AnomalyType(IntEnum):
     PHYSICAL = 200
     FIRE = 201
     ICE = 202
@@ -57,7 +52,7 @@ class Anomaly:
     SHATTER = 5.0
     ASSAULT = 7.13
 
-class CharacterNames:
+class CharacterNames(StrEnum):
     CORIN = 'Corin'
     QINGYI = 'QingYi'
     JANE = 'Jane'

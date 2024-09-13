@@ -1,6 +1,6 @@
 from models import Character
 from consts import EnemyType
-class Enemy():
+class Enemy:
     #enemy
     RES_mult = 1 # durahan
     DMG_TAKEN_MULT = 1

@@ -1,4 +1,4 @@
-from models import Character, Disc, WEngine
+from models import StatsBase, Character
 from services_hakushin import CharacterBuilder
 import json
 import re
@@ -8,16 +8,19 @@ class DiscSetID():
     FREEDOM_BLUE = 31300
     SWING_JAZZ = 31600
 
+
 def load_json(json_url):
         with open(json_url, 'r', encoding="utf-8") as file:
             raw_data = json.load(file)
 
         return raw_data
 
+
 def remove_perc(attr_str):
         pattern = re.compile(r'[\d\.]*')
         attr = pattern.findall(attr_str)[0]
         return float(attr) if attr != '' else 0.0
+
 
 class ServiceCharacter():
     def __init__(self, url):
@@ -28,8 +31,8 @@ class ServiceCharacter():
         serviceDiscs = ServiceDiscs(self.avatar_data['equip'])
         serviceWEngine = ServiceWEngine(self.avatar_data['weapon'])
 
-        disc:Disc = serviceDiscs.build_discs_data()
-        wengine:WEngine = serviceWEngine.build_wengine_data()
+        disc:StatsBase = serviceDiscs.build_discs_data()
+        wengine:StatsBase = serviceWEngine.build_wengine_data()
         char = self.build_char_base_data()
         char.equip_discs(disc)
         char.equip_wengine(wengine)
@@ -40,7 +43,7 @@ class ServiceCharacter():
         code = self.avatar_data['name_mi18n']
         lvl = self.avatar_data['level']
         skills = self.__getSkillsLvl(self.avatar_data['skills'])
-        char = CharacterBuilder(code, lvl, skills).build()
+        char = CharacterBuilder(code, lvl, basic_lvl=skills[0],special_lvl=skills[1],dodge_lvl=skills[2],chain_lvl=skills[3],core_lvl=skills[4],assist_lvl=skills[5]).build()
         
         return char
     
@@ -49,17 +52,15 @@ class ServiceCharacter():
         for skill in skills:
             skillsList.append(skill['level'])
 
-        return tuple(skillsList)
-
-
+        return skillsList
 
 
 class ServiceWEngine():
     def __init__(self, json_data) -> None:
         self.equip_data = json_data
 
-    def build_wengine_data(self) -> WEngine:
-        wEngine = WEngine()
+    def build_wengine_data(self) -> StatsBase:
+        wEngine = StatsBase()
         main_stat = self.equip_data['main_properties'][0]['base']
         wEngine.atk = remove_perc(main_stat)
 
@@ -69,13 +70,14 @@ class ServiceWEngine():
 
         return wEngine
 
+
 class ServiceDiscs():
     def __init__(self,json_data) -> None:
         self.equip_data = json_data
     
 
-    def build_discs_data(self) -> Disc:
-        disc = Disc()
+    def build_discs_data(self) -> StatsBase:
+        disc = StatsBase()
         equip_suit_list = []
         sets = {}
         for equip in self.equip_data:
@@ -96,7 +98,7 @@ class ServiceDiscs():
         disc = self.add_equip_set_stats(disc, sets)
         return disc
 
-    def add_equip_set_stats(self, disc: Disc, sets):
+    def add_equip_set_stats(self, disc: StatsBase, sets):
         if sets.get(DiscSetID.FREEDOM_BLUE) == 2 or sets.get(DiscSetID.FREEDOM_BLUE) == 4:
             disc.anomaly_prof += 30
         if sets.get(DiscSetID.SWING_JAZZ) == 2:
