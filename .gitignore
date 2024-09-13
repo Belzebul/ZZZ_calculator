@@ -1,8 +1,7 @@
 
 hoyolab_data/
-scripts/__pycache__
-scripts/exemplo.py
 Untitled Diagram.drawio
 src/__pycache__/
 uml.drawio
 .$uml.drawio.bkp
+src/.env

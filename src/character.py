@@ -26,7 +26,7 @@ class StatsBase:
     fire_bonus: float = 0.0
     ice_bonus: float = 0.0
 
-    def set_attr_from_id(self, property_id, attr) -> None:
+    def set_attr(self, property_id:int, attr:float) -> None:
         match property_id:
             case AttributeID.HP_BASE: self.hp += attr
             case AttributeID.HP_PERC: self.hp_perc += attr
@@ -100,77 +100,77 @@ class Character(StatsBase):
     wengine = StatsBase()
     discs = StatsBase()
 
-    def equip_discs(self, disc:StatsBase):
+    def equip_discs(self, disc:StatsBase) -> None:
         self.discs = disc
 
-    def equip_wengine(self, wengine: StatsBase):
+    def equip_wengine(self, wengine: StatsBase) -> None:
         self.wengine = wengine
 
-    def get_hp(self):
+    def get_hp(self) -> float:
         self.hp = self.base.hp * (1 + (self.base.hp_perc + self.wengine.hp_perc + self.discs.hp_perc)/100) + self.discs.hp
         return self.hp
 
-    def get_atk(self):
+    def get_atk(self) -> float:
         self.atk = (self.base.atk + self.wengine.atk) * (1 + (self.discs.atk_perc + self.wengine.atk_perc)/100) + self.discs.atk
         return self.atk
     
-    def get_def(self):
+    def get_def(self) -> float:
         self.defense = self.base.defense * (1 + (self.base.def_perc + self.discs.def_perc + self.wengine.def_perc)/100) + self.discs.defense
         return self.defense
     
-    def get_impact(self):
+    def get_impact(self) -> float:
         self.impact = self.base.impact * (1 + self.wengine.impact_perc + self.discs.impact_perc) + self.wengine.impact
         return self.impact
 
-    def get_anomaly_prof(self):
+    def get_anomaly_prof(self) -> float:
         self.anomaly_prof = self.base.anomaly_prof + self.wengine.anomaly_prof + self.discs.anomaly_prof
         return self.anomaly_prof
     
-    def get_crit_rate(self):
+    def get_crit_rate(self) -> float:
         self.crit_rate = (self.crit_rate + self.wengine.crit_rate + self.discs.crit_rate)/100
         return self.crit_rate
 
-    def get_crit_dmg(self):
+    def get_crit_dmg(self) -> float:
         self.crit_dmg = (self.base.crit_dmg + self.wengine.crit_dmg + self.discs.crit_dmg)/100
         return self.crit_dmg
 
-    def get_energy_regen(self):
+    def get_energy_regen(self) -> float:
         self.energy_regen = self.base.energy_regen * (1 + (self.wengine.energy_perc + self.discs.energy_perc)/100)
         return self.energy_regen
 
-    def get_anomaly_mastery(self):
+    def get_anomaly_mastery(self) -> float:
         self.anomaly_mastery = self.base.anomaly_mastery * (1 + (self.wengine.anomaly_mastery + self.discs.anomaly_mastery)/100)
         return self.anomaly_mastery
 
-    def get_pen(self):
+    def get_pen(self) -> float:
         self.pen = (self.base.pen + self.wengine.pen + self.discs.pen)/100
         return self.pen
 
-    def get_pen_flat(self):
+    def get_pen_flat(self) -> float:
         self.pen_flat = self.wengine.pen_flat + self.discs.pen_flat
         return self.pen_flat
     
-    def get_phys_bonus(self):
+    def get_phys_bonus(self) -> float:
         self.phys_bonus = self.base.phys_bonus + self.wengine.phys_bonus + self.discs.phys_bonus
         return self.phys_bonus
 
-    def get_fire_bonus(self):
+    def get_fire_bonus(self) -> float:
         self.fire_bonus = self.base.fire_bonus + self.wengine.fire_bonus + self.discs.fire_bonus
         return self.fire_bonus
     
-    def get_ice_bonus(self):
+    def get_ice_bonus(self) -> float:
         self.ice_bonus = self.base.ice_bonus + self.wengine.ice_bonus + self.discs.ice_bonus
         return self.ice_bonus
 
-    def get_elec_bonus(self):
+    def get_elec_bonus(self) -> float:
         self.elec_bonus = self.base.elec_bonus + self.wengine.elec_bonus + self.discs.elec_bonus
         return self.elec_bonus
     
-    def get_ether_bonus(self):
+    def get_ether_bonus(self) -> float:
         self.ether_bonus = self.base.ether_bonus + self.wengine.ether_bonus + self.discs.ether_bonus
         return self.ether_bonus
 
-    def get_lvl_factor(self):
+    def get_lvl_factor(self) -> float:
         return 0.1551 * self.lvl**2 + 3.141 * self.lvl + 47.2039
   
     def get_bonus_mult(self, anomalyType) -> float:
@@ -184,7 +184,7 @@ class Character(StatsBase):
 
 
 
-    def print_stats(self):
+    def print_stats(self) -> None:
         print(f'HP = {self.get_hp():.0f}')
         print(f'ATK = {self.get_atk():.0f}')
         print(f'DEF = {self.get_def():.0f}')

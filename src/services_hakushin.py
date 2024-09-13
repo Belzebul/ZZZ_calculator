@@ -5,7 +5,7 @@ from pathlib import Path
 import re
 import consts
 from consts import AnomalyType
-from models import SubSkill, Character, Hit, Multiplier, Skill
+from character import SubSkill, Character, Hit, Multiplier, Skill
 
 @dataclass(kw_only=False)
 class CharacterBuilder():
@@ -95,7 +95,7 @@ class CharacterBuilder():
     def __set_core_stats_base(self, lvl):
         core_stats = self.char_base_dict['ExtraLevel'][str(lvl-1)]['Extra']
         for stat in core_stats.values():
-            self.char.base.set_attr_from_id(stat['Prop'], stat['Value'])
+            self.char.base.set_attr(stat['Prop'], stat['Value'])
 
     def __get_lvl_range(self, lvl):
         return str(math.ceil(lvl/10))

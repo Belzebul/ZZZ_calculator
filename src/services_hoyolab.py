@@ -1,4 +1,4 @@
-from models import StatsBase, Character
+from character import StatsBase, Character
 from services_hakushin import CharacterBuilder
 import json
 import re
@@ -66,7 +66,7 @@ class ServiceWEngine():
 
         second_stat = self.equip_data['properties'][0]
         attr = remove_perc(second_stat['base'])
-        wEngine.set_attr_from_id(second_stat['property_id'], attr)
+        wEngine.set_attr(second_stat['property_id'], attr)
 
         return wEngine
 
@@ -84,11 +84,11 @@ class ServiceDiscs():
             for attr_dict in equip['properties']:
                 attr = remove_perc(attr_dict['base'])
                 property_id = attr_dict['property_id']
-                disc.set_attr_from_id(property_id, attr)
+                disc.set_attr(property_id, attr)
 
             main_prop = equip['main_properties'][0]
             attr = remove_perc(main_prop['base'])
-            disc.set_attr_from_id(main_prop['property_id'], attr)
+            disc.set_attr(main_prop['property_id'], attr)
             equip_suit_list.append(equip["equip_suit"])
 
         for equip_suit in equip_suit_list:
