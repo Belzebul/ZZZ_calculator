@@ -37,12 +37,10 @@ class ServiceCharacter:
         service_discs = ServiceDiscs(avatar["equip"])
         service_wengine = ServiceWEngine(avatar["weapon"])
 
-        #discs: StatsBase = service_discs.build_discs_data()
-        disc: DiscSet = service_discs.build_disc_set()
+        discs_set: DiscSet = service_discs.build_disc_set()
         wengine: StatsBase = service_wengine.build_wengine_data()
         char:Character = self.build_char_base_data(avatar)
-        char.equip_disc_set(disc)
-        #char.sum_discs = discs
+        char.equip_disc_set(discs_set)
         char.equip_wengine(wengine)
 
         return char
@@ -58,7 +56,7 @@ class ServiceCharacter:
             special_lvl=skills[1],
             dodge_lvl=skills[2],
             chain_lvl=skills[3],
-            core_lvl=skills[4],
+            core_lvl=skills[4]-1,
             assist_lvl=skills[5],
         ).build()
 
@@ -106,6 +104,7 @@ class ServiceDiscs:
         disc = Disc()
         disc.lvl = disc_data["level"]
         disc.pos = disc_data["equipment_type"]
+        disc.equip_set = disc_data["equip_suit"]["suit_id"]
         main_prop = disc_data["main_properties"][0]
         disc.main_stats.id = main_prop["property_id"]
         disc.main_stats.value = remove_perc(main_prop["base"])

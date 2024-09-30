@@ -52,12 +52,12 @@ class CharacterBuilder:
         self.char.base.energy_regen = self.char_base_dict["Stats"]["SpRecover"] / 100
         self.char.base.pen_p = self.char_base_dict["Stats"]["PenRate"] / 100
 
-    def __find_stat_base(self, lvl, stat_name, growth_name):
+    def __find_stat_base(self, lvl, stat_name, growth_name) -> int:
         stat_base = self.char_base_dict["Stats"][stat_name]
         stat_growth = self.char_base_dict["Stats"][growth_name] / 10000
         lvl_range = self.__get_lvl_range(lvl)
-        ascension_bonus = self.char_base_dict["Level"][lvl_range][stat_name]
-        return stat_base + (lvl - 1) * stat_growth + ascension_bonus
+        ascension_bonus:int = self.char_base_dict["Level"][lvl_range][stat_name]
+        return int(stat_base + (lvl - 1) * stat_growth + ascension_bonus)
 
     def __set_skill(self, lvl, skill_code, anomalyType):
         skills_list: list = self.char_base_dict["Skill"][skill_code]["Description"]

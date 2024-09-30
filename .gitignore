@@ -7,3 +7,4 @@ uml.drawio
 src/.env
 src/models/__pycache__/
 src/parsers/__pycache__/
+src/rascunhos.txt

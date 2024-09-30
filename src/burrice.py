@@ -19,11 +19,6 @@ wengine.anomaly_prof = 75
 burrice = CharacterBuilder(CharacterNames.BURNICE,60,9,9,9,9,9,6).build()
 burrice.equip_wengine(wengine)
 burrice.equip_disc_set(ben_bigger.disc_sets)
-#burrice.sum_discs = ben_bigger.sum_discs
-
-#burrice.sum_discs.atk_perc += 10.0 # hormone punk set hardcoded
-burrice.sum_discs.anomaly_prof += 30.0 # Chaos Jazz 
-burrice.sum_discs.energy_perc += 20.0 # Swing Jazz
 
 # adiciona os buffs condicionais na burrice
 burrice_buffs = ConditionalStats()

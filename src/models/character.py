@@ -62,9 +62,9 @@ class Character(StatsBase):
 
     def get_atk(self) -> float:
         atk_base = self.base.atk + self.wengine.atk
-        atk_percents = 1 + (self.sum_discs.atk_perc + self.wengine.atk_perc) / 100
+        atk_percents = round(1 + (self.sum_discs.atk_perc + self.wengine.atk_perc)/100, 2)
         self.atk = atk_base * atk_percents + self.sum_discs.atk
-        return self.atk
+        return int(self.atk)
 
     def get_def(self) -> float:
         def_percents = 1 + (self.base.def_perc + self.sum_discs.def_perc + self.wengine.def_perc)/ 100

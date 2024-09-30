@@ -30,9 +30,9 @@ def anomaly_hit_dmg(enemy: Enemy, char: Character, anomaly_type: AnomalyType):
     return dmg
 
 
-def skill_hit_dmg(enemy: Enemy, char: Character, subSkill: SubSkill):
-    base_dmg = subSkill.dmg.get_mult(subSkill.lvl) * char.get_atk()
-    dmg_bonus_mult = char.get_bonus_mult(subSkill.hits[0].anomaly)
+def skill_hit_dmg(enemy: Enemy, char: Character, sub_skill: SubSkill):
+    base_dmg = sub_skill.dmg.get_mult(sub_skill.lvl) * char.get_atk()
+    dmg_bonus_mult = char.get_bonus_mult(sub_skill.hits[0].anomaly)
     crit_mult = 1  # + (char.get_crit_rate()*char.get_crit_dmg())
     enemy_def = enemy.get_defense(char)
     dmg = (

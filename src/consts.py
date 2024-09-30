@@ -32,41 +32,6 @@ class AttributeID(IntEnum):
     ETHER_DMG = 31903
 
 
-class EnemyType(IntEnum):
-    DURAHAN = 58
-    TYRFING = 36
-    THUG_ASSAULT = 37
-    RANGE_SOLDIER = 33
-    METAL_GORILLA = 60
-    DEATH_XIII = 45
-    # TODO
-
-
-class AnomalyType(IntEnum):
-    PHYSICAL = 200
-    FIRE = 201
-    ICE = 202
-    ELECTRO = 203
-    ETHER = 205
-
-
-class AnomalyMult:
-    ASSAULT = 7.13
-    BURN = 0.5
-    SHATTER = 5.0
-    SHOCK = 1.25
-    CORRUPTION = 0.625
-
-
-ANOMALY_MULT = {
-    AnomalyType.PHYSICAL: AnomalyMult.ASSAULT,
-    AnomalyType.FIRE: AnomalyMult.BURN,
-    AnomalyType.ICE: AnomalyMult.SHATTER,
-    AnomalyType.ELECTRO: AnomalyMult.SHOCK,
-    AnomalyType.ETHER: AnomalyMult.CORRUPTION,
-}
-
-
 HOYO_MAP:dict[int,str] = {
     AttributeID.HP_BASE: "hp",
     AttributeID.HP_P: "hp_perc",
@@ -98,6 +63,67 @@ HOYO_MAP:dict[int,str] = {
     AttributeID.ELEC_DMG: "elec_bonus",
     AttributeID.ETHER_DMG: "ether_bonus"
 }
+
+
+class EnemyType(IntEnum):
+    DURAHAN = 58
+    TYRFING = 36
+    THUG_ASSAULT = 37
+    RANGE_SOLDIER = 33
+    METAL_GORILLA = 60
+    DEATH_XIII = 45
+    # TODO
+
+
+class AnomalyType(IntEnum):
+    PHYSICAL = 200
+    FIRE = 201
+    ICE = 202
+    ELECTRO = 203
+    ETHER = 205
+
+
+class AnomalyMult:
+    ASSAULT = 7.13
+    BURN = 0.5
+    SHATTER = 5.0
+    SHOCK = 1.25
+    CORRUPTION = 0.625
+
+
+class DiscSetID(IntEnum):
+    PUFFER_ELECTRO = 31100
+    FREEDOM_BLUE = 31300
+    SWING_JAZZ = 31600
+    THUNDER_METAL = 32400
+    CHAOS_JAZZ = 31800
+    POLAR_METAL = 32500
+    WOODPECKER_ELECTRO = 31000
+    FANGED_METAL = 32600
+    HORMONE_PUNK = 31400
+
+
+HOYO_2P_DISCSET:dict[int, tuple[int, float]] = {
+    DiscSetID.PUFFER_ELECTRO: ( AttributeID.PEN_P, 8.0 ),
+    DiscSetID.FREEDOM_BLUE: (AttributeID.ANOMALY_PROF, 30.0),
+    DiscSetID.SWING_JAZZ: (AttributeID.ENERGY_P, 20.0),
+    DiscSetID.THUNDER_METAL: (AttributeID.ELEC_DMG, 10.0),
+    DiscSetID.CHAOS_JAZZ: (AttributeID.ANOMALY_PROF, 30.0),
+    DiscSetID.POLAR_METAL: (AttributeID.ICE_DMG, 10.0),
+    DiscSetID.WOODPECKER_ELECTRO: (AttributeID.CRIT_RATE, 8.0),
+    DiscSetID.FANGED_METAL: (AttributeID.PHYS_DMG, 10.0),
+    DiscSetID.HORMONE_PUNK: (AttributeID.ATK_P, 10.0),
+}
+
+
+ANOMALY_MULT = {
+    AnomalyType.PHYSICAL: AnomalyMult.ASSAULT,
+    AnomalyType.FIRE: AnomalyMult.BURN,
+    AnomalyType.ICE: AnomalyMult.SHATTER,
+    AnomalyType.ELECTRO: AnomalyMult.SHOCK,
+    AnomalyType.ETHER: AnomalyMult.CORRUPTION,
+}
+
 
 
 class CharacterNames(StrEnum):
@@ -146,7 +172,7 @@ class CharacterId(StrEnum):
     KOLEDA = "Koleda"
     SETH = "1271"
     BURNICE = "Burnice"
-    ELLEN = "Ellen"
+    ELLEN = "1191"
 
 
 CHAR_LIST_CODES = [
@@ -180,4 +206,3 @@ CHAR_LIST_CODES = [
     "Burnice",
     "Ellen",
 ]
-
