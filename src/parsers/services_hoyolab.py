@@ -2,7 +2,9 @@ import json
 import re
 
 from consts import CharacterId
+from models import disc
 from models.character import Character, StatsBase
+from models.disc import Disc, DiscSet, Stat
 from parsers.services_hakushin import CharacterBuilder
 
 
@@ -35,10 +37,12 @@ class ServiceCharacter:
         service_discs = ServiceDiscs(avatar["equip"])
         service_wengine = ServiceWEngine(avatar["weapon"])
 
-        disc: StatsBase = service_discs.build_discs_data()
+        #discs: StatsBase = service_discs.build_discs_data()
+        disc: DiscSet = service_discs.build_disc_set()
         wengine: StatsBase = service_wengine.build_wengine_data()
-        char = self.build_char_base_data(avatar)
-        char.equip_discs(disc)
+        char:Character = self.build_char_base_data(avatar)
+        char.equip_disc_set(disc)
+        #char.sum_discs = discs
         char.equip_wengine(wengine)
 
         return char
@@ -82,28 +86,50 @@ class ServiceWEngine:
 
         second_stat = self.equip_data["properties"][0]
         attr = remove_perc(second_stat["base"])
-        wengine.set_attr(second_stat["property_id"], attr)
-
+        wengine.incr_attr(second_stat["property_id"], attr)
         return wengine
 
 
 class ServiceDiscs:
     def __init__(self, json_data) -> None:
-        self.equip_data = json_data
+        self.disc_set_json = json_data
+
+    def build_disc_set(self) -> DiscSet:
+        disc_set = DiscSet()
+        for disc_json in self.disc_set_json:
+            disc_set.discs.append(self.build_disc(disc_json))
+
+        return disc_set
+
+
+    def build_disc(self, disc_data:dict) -> Disc:
+        disc = Disc()
+        disc.lvl = disc_data["level"]
+        disc.pos = disc_data["equipment_type"]
+        main_prop = disc_data["main_properties"][0]
+        disc.main_stats.id = main_prop["property_id"]
+        disc.main_stats.value = remove_perc(main_prop["base"])
+
+        for attr in disc_data["properties"]:
+            stat = Stat()
+            stat.id = attr["property_id"]
+            stat.value = remove_perc(attr["base"])
+            disc.substats.append(stat)
+
+        return disc
 
     def build_discs_data(self) -> StatsBase:
         disc = StatsBase()
         equip_suit_list = []
         sets = {}
-        for equip in self.equip_data:
+        for equip in self.disc_set_json:
             for attr_dict in equip["properties"]:
                 attr = remove_perc(attr_dict["base"])
-                property_id = attr_dict["property_id"]
-                disc.set_attr(property_id, attr)
+                disc.incr_attr(attr_dict["property_id"], attr)
 
             main_prop = equip["main_properties"][0]
             attr = remove_perc(main_prop["base"])
-            disc.set_attr(main_prop["property_id"], attr)
+            disc.incr_attr(main_prop["property_id"], attr)
             equip_suit_list.append(equip["equip_suit"])
 
         for equip_suit in equip_suit_list:
@@ -120,9 +146,9 @@ class ServiceDiscs:
         ):
             disc.anomaly_prof += 30
         if sets.get(DiscSetID.SWING_JAZZ) == 2:
-            disc.energy_regen += 20
+            disc.energy_perc += 20
         if sets.get(DiscSetID.PUFFER_ELECTRO) == 2:
-            disc.pen += 8
+            disc.pen_p += 8
         if (
             sets.get(DiscSetID.THUNDER_METAL) == 2
             or sets.get(DiscSetID.THUNDER_METAL) == 4

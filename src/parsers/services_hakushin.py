@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import consts
-from consts import AnomalyType, AttributeID
+from consts import HOYO_MAP, AnomalyType, AttributeID
 from models.character import Character, Hit, Multiplier, Skill, SubSkill
 
 
@@ -50,7 +50,7 @@ class CharacterBuilder:
         self.char.base.crit_dmg = self.char_base_dict["Stats"]["CritDamage"] / 100
         self.char.base.impact = self.char_base_dict["Stats"]["BreakStun"]
         self.char.base.energy_regen = self.char_base_dict["Stats"]["SpRecover"] / 100
-        self.char.base.pen = self.char_base_dict["Stats"]["PenRate"] / 100
+        self.char.base.pen_p = self.char_base_dict["Stats"]["PenRate"] / 100
 
     def __find_stat_base(self, lvl, stat_name, growth_name):
         stat_base = self.char_base_dict["Stats"][stat_name]
@@ -100,17 +100,18 @@ class CharacterBuilder:
         matches = pattern.findall(desc)
         return int(matches[0]) if len(matches) != 0 else 1
 
-    def __set_core_stats_base(self, lvl):
+    def __set_core_stats_base(self, lvl) -> None:
         core_stats = self.char_base_dict["ExtraLevel"][str(lvl)]["Extra"]
         for stat in core_stats.values():
-            if stat['Prop'] == AttributeID.CRIT_RATE_BASE:
-                crit = stat["Value"]/100
-                self.char.base.set_attr(stat["Prop"], crit)
-                continue
+            match stat["Prop"]:
+                case (AttributeID.CRIT_RATE_BASE
+                    | AttributeID.CRIT_DMG_BASE
+                    | AttributeID.ENERGY_RATE):
+                    stat["Value"] = stat["Value"]/100
 
-            self.char.base.set_attr(stat["Prop"], stat["Value"])
+            self.char.base.incr_attr(stat["Prop"], stat["Value"])
 
-    def __get_lvl_range(self, lvl):
+    def __get_lvl_range(self, lvl) -> str:
         return str(math.ceil(lvl / 10))
 
 

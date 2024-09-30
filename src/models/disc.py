@@ -1,43 +1,31 @@
 from dataclasses import dataclass, field
-
-from consts import AttributeID
-
-main_stats = [
-    AttributeID.HP_FLAT,
-    AttributeID.HP_P,
-    AttributeID.ATK_FLAT,
-    AttributeID.ATK_P,
-    AttributeID.DEF_FLAT,
-    AttributeID.DEF_P,
-    AttributeID.CRIT_RATE,
-    AttributeID.CRIT_DMG,
-    AttributeID.ANOMALY_PROF,
-    AttributeID.ANOMALY_MAST,
-    AttributeID.PEN_P,
-    AttributeID.IMPACT_P,
-    AttributeID.ENERGY_P,
-    AttributeID.PHYS_DMG,
-    AttributeID.FIRE_DMG,
-    AttributeID.ICE_DMG,
-    AttributeID.ELEC_DMG,
-    AttributeID.ETHER_DMG,
-]
-
+from models.stats_base import StatsBase
 
 @dataclass
 class Stat:
-    id: int
-    value: float
+    id: int = 0
+    value: float = 0.0
 
 
 @dataclass
 class Disc:
-    pos: int
-    equip_set: int
-    main_stats: Stat
+    lvl: int = 15
+    pos: int = 0
+    equip_set: int = 0
+    main_stats: Stat = field(default_factory=Stat)
     substats: list[Stat] = field(default_factory=list)
 
 
 @dataclass
-class Discs:
+class DiscSet:
+    sets_buffs = []
     discs: list[Disc] = field(default_factory=list)
+
+    def sum_stats(self) -> StatsBase:
+        total_stats = StatsBase()
+        for disc in self.discs:
+            total_stats.incr_attr(disc.main_stats.id, disc.main_stats.value)
+            for stat in disc.substats:
+                total_stats.incr_attr(stat.id, stat.value)
+
+        return total_stats

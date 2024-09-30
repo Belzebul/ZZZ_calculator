@@ -2,7 +2,8 @@
 from dataclasses import dataclass
 
 from consts import AnomalyType
-from models.character import Character, StatsBase
+from models.character import Character
+from models.stats_base import StatsBase
 
 
 @dataclass
@@ -38,7 +39,7 @@ class ConditionalStats:
         return self.char.get_anomaly_mastery() * (1 + self.conditional_buffs.anomaly_mastery)
 
     def get_pen(self) -> float:
-        return (self.char.get_pen() + self.conditional_buffs.pen)/100
+        return (self.char.get_pen() + self.conditional_buffs.pen_p)/100
 
     def get_pen_flat(self) -> float:
         return self.char.get_pen_flat() + self.conditional_buffs.pen_flat

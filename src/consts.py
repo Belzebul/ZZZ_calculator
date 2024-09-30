@@ -1,6 +1,5 @@
 from enum import IntEnum, StrEnum
 
-
 class AttributeID(IntEnum):
     HP_BASE = 11101
     HP_P = 11102
@@ -20,8 +19,8 @@ class AttributeID(IntEnum):
     PEN_BASE = 23101
     PEN_P = 23103
     PEN_FLAT = 23203
-    ENERGY_RATE = 1
-    ENERGY_P = 2
+    ENERGY_RATE = 30501
+    ENERGY_P = 30502
     ANOMALY_PROF_BASE = 31201
     ANOMALY_PROF = 31203
     ANOMALY_MAST_BASE = 31401
@@ -65,6 +64,39 @@ ANOMALY_MULT = {
     AnomalyType.ICE: AnomalyMult.SHATTER,
     AnomalyType.ELECTRO: AnomalyMult.SHOCK,
     AnomalyType.ETHER: AnomalyMult.CORRUPTION,
+}
+
+
+HOYO_MAP:dict[int,str] = {
+    AttributeID.HP_BASE: "hp",
+    AttributeID.HP_P: "hp_perc",
+    AttributeID.HP_FLAT: "hp",
+    AttributeID.ATK_BASE: "atk",
+    AttributeID.ATK_P: "atk_perc",
+    AttributeID.ATK_FLAT: "atk",
+    AttributeID.IMPACT: "impact",
+    AttributeID.IMPACT_P: "impact_perc",
+    AttributeID.DEF_BASE: "defense",
+    AttributeID.DEF_P: "def_perc",
+    AttributeID.DEF_FLAT: "defense",
+    AttributeID.CRIT_RATE_BASE: "crit_rate",
+    AttributeID.CRIT_RATE: "crit_rate",
+    AttributeID.CRIT_DMG_BASE: "crit_dmg",
+    AttributeID.CRIT_DMG: "crit_dmg",
+    AttributeID.PEN_BASE: "pen_p",
+    AttributeID.PEN_P: "pen_p",
+    AttributeID.PEN_FLAT: "pen_flat",
+    AttributeID.ENERGY_RATE: "energy_regen",
+    AttributeID.ENERGY_P: "energy_perc",
+    AttributeID.ANOMALY_PROF_BASE: "anomaly_prof",
+    AttributeID.ANOMALY_PROF: "anomaly_prof",
+    AttributeID.ANOMALY_MAST_BASE: "anomaly_mastery",
+    AttributeID.ANOMALY_MAST: "anomaly_mastery",
+    AttributeID.PHYS_DMG: "phys_bonus",
+    AttributeID.FIRE_DMG: "fire_bonus",
+    AttributeID.ICE_DMG: "ice_bonus",
+    AttributeID.ELEC_DMG: "elec_bonus",
+    AttributeID.ETHER_DMG: "ether_bonus"
 }
 
 
@@ -148,3 +180,4 @@ CHAR_LIST_CODES = [
     "Burnice",
     "Ellen",
 ]
+
