@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+import re
 
 from consts import AnomalyType
 from models.disc import DiscSet
@@ -12,26 +13,43 @@ class Hit:
 
 @dataclass(slots=True)
 class Multiplier:
-    base: float
-    growth: float
-    mult: float
+    param_id: list[str]
+    name:str
+    desc: str
+    base: list[float]
+    growth: list[float]
+    mult: float = field(init=False)
 
-    def get_mult(self, lvl):
-        return (self.base + (lvl - 1) * self.growth) * self.mult / 100
+    def calc_mult(self, lvl) -> None:
+        find_mult_pattern = re.compile(r"\{(\w*\:\d*\, \w*\:\d*)\}")
+        mult = self.desc
+        for index, _ in enumerate(self.base):
+            mult = find_mult_pattern.sub(self.__mount_mult_base(lvl, index), mult, count=1)
+
+        mult = re.sub(r"[\{\}]","", mult)
+        self.mult = round(eval(mult), 2)
+
+    def __mount_mult_base(self, lvl, index) -> str:
+        return str(self.base[index] + (lvl - 1) * self.growth[index])
+
 
 
 @dataclass(slots=True)
 class SubSkill:
-    name: str
     lvl: int
-    dmg: Multiplier
-    daze: Multiplier
-    hits: list[Hit]
+    dmg: Multiplier = field(init=False)
+    daze: Multiplier = field(init=False)
+    hits: list[Hit] = field(init=False)
 
+@dataclass(slots=True)
+class SkillDesc:
+    name:str
+    desc:str
 
 @dataclass(slots=True)
 class Skill:
     lvl: int = 1
+    description: list[SkillDesc] = field(default_factory=list)
     sub_skills: list[SubSkill] = field(default_factory=list)
 
 
@@ -68,7 +86,7 @@ class Character(StatsBase):
 
     def get_def(self) -> float:
         def_percents = 1 + (self.base.def_perc + self.sum_discs.def_perc + self.wengine.def_perc)/ 100
-        self.defense = self.base.defense* def_percents + self.sum_discs.defense
+        self.defense = self.base.defense * def_percents + self.sum_discs.defense
         return self.defense
 
     def get_impact(self) -> float:
@@ -129,8 +147,8 @@ class Character(StatsBase):
     def get_lvl_factor(self) -> float:
         return 0.1551 * self.lvl**2 + 3.141 * self.lvl + 47.2039
 
-    def get_bonus_mult(self, anomalyType:int) -> float:
-        match anomalyType:
+    def get_bonus_mult(self, anomaly_type:int) -> float:
+        match anomaly_type:
             case AnomalyType.PHYSICAL:
                 return 1 + self.get_phys_bonus() / 100
             case AnomalyType.FIRE:

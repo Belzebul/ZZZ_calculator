@@ -125,7 +125,6 @@ ANOMALY_MULT = {
 }
 
 
-
 class CharacterNames(StrEnum):
     CORIN = "Corin"
     QINGYI = "QingYi"
@@ -152,7 +151,7 @@ class CharacterNames(StrEnum):
 
 class CharacterId(StrEnum):
     CORIN = "1061"
-    QINGYI = "QingYi"
+    QINGYI = "1251"
     JANE = "1261"
     SOUKAKU = "1131"
     BILLY = "1081"
@@ -162,16 +161,16 @@ class CharacterId(StrEnum):
     PIPER = "1281"
     NEKOMATA = "1021"
     NEKOMATA_2 = "1022"
-    ZHUYUAN = "Zhu Yuan"
-    LYCAON = "Lycaon"
+    ZHUYUAN = "1241"
+    LYCAON = "1141"
     ANTON = "1111"
     SOLDIER_11 = "1041"
     BEN = "1121"
-    RINA = "Rina"
+    RINA = "1211"
     LUCY = "1151"
-    KOLEDA = "Koleda"
+    KOLEDA = "1101"
     SETH = "1271"
-    BURNICE = "Burnice"
+    BURNICE = "1171"
     ELLEN = "1191"
 
 
